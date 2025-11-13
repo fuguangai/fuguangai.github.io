@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,9 +6,7 @@
         content="FuLi AI: An Efficient Video Diffusion Model via Weak-to-Strong Distribution Matching">
   <meta name="keywords" content="Step Distillation, Video Generation, Diffusion Models">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-      <div class="section-title has-text-centered">
   <title>FuLi AI</title>
-  </div>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
@@ -136,6 +133,127 @@
     .prompt-wrap:hover .prompt {
       opacity: 1;
       pointer-events: all;
+    }
+    
+    /* 视频容器样式 */
+    .video-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* 自定义播放控件样式 */
+    .video-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 15px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .video-container:hover .video-controls {
+      opacity: 1;
+    }
+    
+    .control-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+    
+    .control-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .play-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .volume-slider {
+      width: 80px;
+      height: 4px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      outline: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .volume-container:hover .volume-slider {
+      opacity: 1;
+    }
+    
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+    }
+    
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      border: none;
+    }
+    
+    /* 加载指示器样式 */
+    .loading-placeholder {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      z-index: 5;
+    }
+    
+    .loading-text {
+      margin-bottom: 10px;
+    }
+    
+    .loading-icon {
+      font-size: 24px;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
   </style>
   <style>
@@ -324,96 +442,224 @@
 
     <!-- 统一视频容器结构 -->
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/1.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/2.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/3.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
-  
-
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/4.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/5.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
-
     <div style="display: flex; height: 60vh; width: 100%; margin-bottom: 2rem;">
-      <div class="video-container" style="flex: 1; position: relative; display: flex; justify-content: center; align-items: center;">
-        <div class="loading-placeholder" style="position: absolute;">
+      <div class="video-container">
+        <div class="loading-placeholder">
           <div class="loading-text">Loading...</div>
           <div class="loading-icon">☕</div>
         </div>
-        <video autoplay playsinline muted loop 
-               style="width: 100%; height: 100%; object-fit: contain;"
-               onloadeddata="this.style.display='block'; this.previousElementSibling.style.display='none';"
+        <video preload="metadata" playsinline loop 
+               style="width: 100%; height: 100%; object-fit: contain; display: none;"
                src="./assets/soft_editing/6.mp4">
         </video>
+        <div class="video-controls">
+          <button class="control-btn play-btn" onclick="togglePlay(this)">
+            <i class="fas fa-play"></i>
+          </button>
+          <div class="volume-container">
+            <button class="control-btn volume-btn" onclick="toggleMute(this)">
+              <i class="fas fa-volume-up"></i>
+            </button>
+            <input type="range" min="0" max="1" step="0.1" value="1" class="volume-slider" oninput="setVolume(this)">
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 </section>
 
-
+<script>
+  // 视频控制功能
+  function togglePlay(button) {
+    const container = button.closest('.video-container');
+    const video = container.querySelector('video');
+    const icon = button.querySelector('i');
+    
+    if (video.paused) {
+      video.play();
+      icon.classList.remove('fa-play');
+      icon.classList.add('fa-pause');
+    } else {
+      video.pause();
+      icon.classList.remove('fa-pause');
+      icon.classList.add('fa-play');
+    }
+  }
+  
+  function toggleMute(button) {
+    const container = button.closest('.video-container');
+    const video = container.querySelector('video');
+    const icon = button.querySelector('i');
+    const volumeSlider = container.querySelector('.volume-slider');
+    
+    if (video.muted) {
+      video.muted = false;
+      icon.classList.remove('fa-volume-mute');
+      icon.classList.add('fa-volume-up');
+      volumeSlider.value = video.volume;
+    } else {
+      video.muted = true;
+      icon.classList.remove('fa-volume-up');
+      icon.classList.add('fa-volume-mute');
+    }
+  }
+  
+  function setVolume(slider) {
+    const container = slider.closest('.video-container');
+    const video = container.querySelector('video');
+    const volumeBtn = container.querySelector('.volume-btn i');
+    
+    video.volume = slider.value;
+    
+    if (video.volume == 0) {
+      volumeBtn.classList.remove('fa-volume-up');
+      volumeBtn.classList.add('fa-volume-mute');
+    } else {
+      volumeBtn.classList.remove('fa-volume-mute');
+      volumeBtn.classList.add('fa-volume-up');
+    }
+  }
+  
+  // 视频加载完成后显示视频并隐藏加载指示器
+  document.addEventListener('DOMContentLoaded', function() {
+    const videos = document.querySelectorAll('.video-container video');
+    
+    videos.forEach(video => {
+      video.addEventListener('loadeddata', function() {
+        this.style.display = 'block';
+        this.previousElementSibling.style.display = 'none';
+      });
+      
+      // 视频结束时重置播放按钮
+      video.addEventListener('ended', function() {
+        const container = this.closest('.video-container');
+        const playBtn = container.querySelector('.play-btn i');
+        playBtn.classList.remove('fa-pause');
+        playBtn.classList.add('fa-play');
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
